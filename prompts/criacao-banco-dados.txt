@@ -1,0 +1,69 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+Table ATIVO {
+  id integer [primary key]
+  ticker varchar
+  empresa varchar
+}
+
+Table HIST_ATIVO {
+  id integer [primary key]
+  id_ativo integer
+  data date
+  abertura float
+  fechamento float
+  maximo float
+  minimo float
+}
+
+Table OPCAO {
+  id integer [primary key]
+  id_ativo integer
+  tipo varchar
+  strike float
+  vencimento date
+  ticker varchar
+}
+
+Table HIST_OPCAO {
+  id integer [primary key]
+  id_opcao integer
+  data date
+  abertura float
+  fechamento float
+  maximo float
+  minimo float
+}
+
+Table SIMULACAO {
+  id integer [primary key]
+  id_opcao integer
+  data_inicio date
+  data_termino date
+  quantidade float
+  cenario text [note: 'MBG']
+}
+
+Table RESULTADOS {
+  id integer [primary key]
+  id_simulacao integer
+  data date
+  preco_ativo float
+  valor_delta float
+  preco_opcao float
+  preco_opcao_simulacao float
+  qtd_ativo float
+  qtd_ajuste_diario float
+  fluxo_caixa float
+  saldo_portfolio float
+}
+
+
+
+Ref: ATIVO.id < OPCAO.id_ativo
+Ref: ATIVO.id < HIST_ATIVO.id_ativo
+Ref: OPCAO.id < SIMULACAO.id_opcao
+Ref: OPCAO.id < HIST_OPCAO.id_opcao
+Ref: SIMULACAO.id < RESULTADOS.id_simulacao
+
