@@ -135,6 +135,7 @@ class DeltaHedgeAjustePeloDia:
         self.ajuste_saldo = []
         self.saldo_diario = []
         self.datas_ajuste = []  # Lista para armazenar as datas de ajuste
+        self.datas_ajuste_real = []  # Lista para armazenar as datas onde realmente houve ajuste
         self.qtd_acoes = []     # Lista para armazenar a quantidade de ações
         
         for i, (data_str, preco_ativo) in enumerate(self.precos_ativo):
@@ -190,6 +191,9 @@ class DeltaHedgeAjustePeloDia:
                 valor_acoes = diferenca * preco_ativo  # Valor gasto na compra das ações
                 ajuste = valor_opcoes - valor_acoes  # Saldo inicial
                 
+                # Primeiro dia sempre é ajuste
+                self.datas_ajuste_real.append(data)
+                
             else:
                 # Dias seguintes: ajusta posição baseado na diferença de delta apenas se for dia de ajuste
                 if eh_ajuste:
@@ -199,6 +203,9 @@ class DeltaHedgeAjustePeloDia:
                     diferenca = qtd_acoes_nova - qtd_acoes_anterior
                     # Calcula o ajuste no saldo
                     ajuste = -diferenca * preco_ativo  # Negativo porque se comprar gasta, se vender recebe
+                    
+                    # Registra a data de ajuste real
+                    self.datas_ajuste_real.append(data)
                 else:
                     # Mantém a quantidade de ações do último ajuste
                     qtd_acoes_nova = self.qtd_acoes[-1]
@@ -252,7 +259,7 @@ class DeltaHedgeAjustePeloDia:
             'Qtd Ações': self.qtd_acoes,
             'Ajuste Saldo': self.ajuste_saldo,
             'Saldo Acumulado': self.saldo_diario,
-            'Ajuste': [datetime.strptime(data, "%Y-%m-%d").date() in self.datas_ajuste for data in [row[0] for row in self.precos_ativo]]
+            'Ajuste': [datetime.strptime(data, "%Y-%m-%d").date() in self.datas_ajuste_real for data in [row[0] for row in self.precos_ativo]]
         })
         
         # Calcula o saldo real (saldo acumulado + valor das ações - valor das opções)
@@ -307,6 +314,7 @@ class DeltaHedgeAjustePeloDia:
         print("================================================================================")
         
         print(f"\nTotal de dias: {len(df)}")
+        print(f"Total de ajustes: {len(self.datas_ajuste_real)}")
         print(f"Taxa de juros: {self.taxa_juros*100:.1f}%")
         print(f"Pregões de Volatilidade: {self.pregoes_volatilidade}")
 

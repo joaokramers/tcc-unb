@@ -55,20 +55,22 @@ class TradeHelper:
         return float(volatilidade)
 
     @staticmethod
-    def recuperaVolatilidadeAnualPara_x_Pregoes(conn: sqlite3.Connection, pregoes, ticker: str, data_referencia: str) -> float:
+    def _recuperaVolatilidadeBase(conn: sqlite3.Connection, pregoes, ticker: str, data_referencia: str) -> tuple:
         """
-        Calcula a volatilidade anualizada com base nos últimos N pregões.
+        Método base para calcular volatilidade com base nos últimos N pregões.
+        
         Args:
             conn: conexão com o banco SQLite
+            pregoes: número de pregões para calcular a volatilidade
             ticker: ticker do ativo (ex: 'PETR4')
             data_referencia: data de referência (formato: YYYY-MM-DD)
             
         Returns:
-            Volatilidade histórica anualizada (ex: 0.22 para 22%)
+            tuple: (retornos, volatilidade_diaria)
         """
         cursor = conn.cursor()
         data_ref = datetime.strptime(data_referencia, '%Y-%m-%d')
-        data_inicial = data_ref - timedelta(days=pregoes*2)  # garante folga para pelo o dobropregões
+        data_inicial = data_ref - timedelta(days=pregoes*2)  # garante folga para pelo o dobro de pregões
 
         # Seleciona os últimos fechamentos antes ou igual à data de referência
         cursor.execute('''
@@ -90,13 +92,52 @@ class TradeHelper:
         # Reverte para ordem cronológica
         precos = [float(preco) for _, preco in reversed(resultados)]
 
-        # Retornos logarítmicos ou percentuais (ambos funcionam)
+        # Retornos percentuais diários
         retornos = np.array(precos[1:]) / np.array(precos[:-1]) - 1
 
-        # Anualiza com fator sqrt(252)
-        volatilidade_anual = np.std(retornos) * np.sqrt(252)
+        # Volatilidade diária (sem anualização)
+        volatilidade_diaria = np.std(retornos)
 
+        return retornos, volatilidade_diaria
+
+    @staticmethod
+    def recuperaVolatilidadeAnualPara_x_Pregoes(conn: sqlite3.Connection, pregoes, ticker: str, data_referencia: str) -> float:
+        """
+        Calcula a volatilidade anualizada com base nos últimos N pregões.
+        
+        Args:
+            conn: conexão com o banco SQLite
+            pregoes: número de pregões para calcular a volatilidade
+            ticker: ticker do ativo (ex: 'PETR4')
+            data_referencia: data de referência (formato: YYYY-MM-DD)
+            
+        Returns:
+            Volatilidade histórica anualizada (ex: 0.22 para 22%)
+        """
+        _, volatilidade_diaria = TradeHelper._recuperaVolatilidadeBase(conn, pregoes, ticker, data_referencia)
+        
+        # Anualiza com fator sqrt(252)
+        volatilidade_anual = volatilidade_diaria * np.sqrt(252)
+        
         return float(volatilidade_anual)
+
+    @staticmethod
+    def recuperaVolatilidadeDiariaPara_x_Pregoes(conn: sqlite3.Connection, pregoes, ticker: str, data_referencia: str) -> float:
+        """
+        Calcula a volatilidade diária (não anualizada) com base nos últimos N pregões.
+        
+        Args:
+            conn: conexão com o banco SQLite
+            pregoes: número de pregões para calcular a volatilidade
+            ticker: ticker do ativo (ex: 'PETR4')
+            data_referencia: data de referência (formato: YYYY-MM-DD)
+            
+        Returns:
+            Volatilidade histórica diária (não anualizada) (ex: 0.015 para 1.5% ao dia)
+        """
+        _, volatilidade_diaria = TradeHelper._recuperaVolatilidadeBase(conn, pregoes, ticker, data_referencia)
+        
+        return float(volatilidade_diaria)
 
     @staticmethod
     def calcular_dias_uteis(conn: sqlite3.Connection, id_ativo: int, data_inicio: date, data_fim: date) -> int:
@@ -176,7 +217,7 @@ class TradeHelper:
         else:
             raise ValueError("Tipo de opção inválido. Use 'call' ou 'put'.")
 
-    def rgbm(n, s0, mu, sigma, seed=None):
+    def rgbm(n, s0, mu, sigma, seed=None, ate_passo=None):
         """
         Simula o movimento browniano geométrico de forma recursiva (discreta).
         
@@ -186,6 +227,7 @@ class TradeHelper:
             mu (float): retorno médio
             sigma (float): volatilidade
             seed (int): semente aleatória (opcional)
+            ate_passo (int): até qual passo simular (se None, vai até n)
             
         Returns:
             list: trajetória do processo GBM
@@ -196,9 +238,15 @@ class TradeHelper:
         if seed is not None:
             np.random.seed(seed)
 
+        # Define até qual passo simular
+        if ate_passo is None:
+            ate_passo = n
+        else:
+            ate_passo = min(ate_passo, n)  # Não pode ir além de n
+
         s_k = [float(s0)]  # valor inicial
         dt = 1/n # incremento de tempo 
-        for k in range(n):
+        for k in range(ate_passo):
             z = np.random.normal()
             next_val = s_k[k] + s_k[k] * (mu * dt + sigma * np.sqrt(dt) * z)
             s_k.append(next_val)

@@ -40,7 +40,7 @@ def gravar_dados_acao():
                 float(row['Abertura']),
                 float(row['Fechamento']),
                 float(row['Máxima']),
-                float(row['Mínima'])
+                float(row['Mínimadir'])
             ))
         
         # Inserir os dados na tabela HIST_ATIVO

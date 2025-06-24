@@ -9,7 +9,7 @@ from datetime import datetime
 from DeltaHedgeAjustePeloDia import DeltaHedgeAjustePeloDia
 
 # Constante para o ID da simulação
-ID_SIMULACAO = 5
+ID_SIMULACAO = 1
 
 def executar_cenario(conn: sqlite3.Connection, id_simulacao: int, frequencia_ajuste: int = 1,
                     taxa_juros: float = 0.06, pregoes_volatilidade: int = 30):
@@ -116,7 +116,7 @@ def main():
         executar_cenario(
             conn=conn,
             id_simulacao=ID_SIMULACAO,
-            frequencia_ajuste=10,
+            frequencia_ajuste=1,
             taxa_juros=0.06,
             pregoes_volatilidade=30
         )

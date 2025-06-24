@@ -35,7 +35,7 @@ class MonteCarloSimulator:
 
     def simular_trajetoria_mbg(self, pregoes: int, seed: int = None) -> list:
         n = pregoes
-        return TradeHelper.rgbm(n,self.S0, self.mu, self.sigma,seed)
+        return TradeHelper.rgbm(n, self.S0, self.mu, self.sigma, seed, ate_passo=n)
 
     def simular_multiplas_trajetorias(self, pregoes: int, n_simulacoes: int, seed: int = None) -> np.ndarray:
         if seed is not None:
