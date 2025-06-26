@@ -14,7 +14,7 @@ ID_SIMULACAO =5
 
 class ComparadorPrecosOpcoes:
     def __init__(self, conn: sqlite3.Connection, id_simulacao: int, pregoes_volatilidade: int = 30,
-                 taxa_juros: float = 0.06):
+                 taxa_juros: float = 0.15):
         """
         Inicializa a classe ComparadorPrecosOpcoes.
         
@@ -22,7 +22,7 @@ class ComparadorPrecosOpcoes:
             conn: Conexão com o banco de dados SQLite
             id_simulacao: ID da simulação na tabela SIMULACAO
             pregoes_volatilidade: Número de pregões para cálculo da volatilidade (padrão: 30)
-            taxa_juros: Taxa de juros anual (padrão: 6%)
+            taxa_juros: Taxa de juros anual (padrão: 15%)
         """
         self.conn = conn
         self.id_simulacao = id_simulacao
@@ -287,7 +287,7 @@ if __name__ == "__main__":
             conn=conn,
             id_simulacao=ID_SIMULACAO,
             pregoes_volatilidade=30,  # x pregões para cálculo da volatilidade
-            taxa_juros=0.06          # 6% ao ano
+            taxa_juros=0.15          # 15% ao ano
         )
         
         # Processa os dados

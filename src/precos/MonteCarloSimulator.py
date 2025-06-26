@@ -190,7 +190,7 @@ if __name__ == "__main__":
     S_t = preco_final[0]
 
     # 5. Parâmetros do modelo
-    mu = 0.06
+    mu = 0.15
     #sigma = TradeHelper.recuperaVolatilidadeAnual(conn, 'PETR4', data_inicial.strftime('%Y-%m-%d'))
     pregoes_volatilidade = 252
     sigma = TradeHelper.recuperaVolatilidadeAnualPara_x_Pregoes(conn, pregoes_volatilidade, 'PETR4', data_inicial.strftime('%Y-%m-%d'))

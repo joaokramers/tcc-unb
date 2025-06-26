@@ -103,7 +103,7 @@ class PlotadorPrecosPetrobras:
         
         # Parâmetros para simulação de Monte Carlo
         n_simulacoes = 1000
-        mu = 0.06  # Taxa de retorno anual (6%)
+        mu = 0.15  # Taxa de retorno anual (15%)
         
         # Simulação de Monte Carlo para cada dia
         print(f"Executando {n_simulacoes} simulações para cada dia...")

@@ -1,5 +1,6 @@
 import sys
 import os
+import numpy as np
 
 # Adiciona o diretório 'src' ao path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -12,7 +13,7 @@ from DeltaHedgeAjustePeloLote import DeltaHedgeAjustePeloLote
 ID_SIMULACAO = 11
 
 def executar_cenario(conn: sqlite3.Connection, id_simulacao: int, limite_lote: int = 100,
-                    taxa_juros: float = 0.06, pregoes_volatilidade: int = 30):
+                    taxa_juros: float = 0.15, pregoes_volatilidade: int = 30):
     """
     Executa um cenário de simulação de delta hedge.
     
@@ -98,8 +99,8 @@ def main():
         executar_cenario(
             conn=conn,
             id_simulacao=ID_SIMULACAO,
-            limite_lote=100,
-            taxa_juros=0.06,
+            limite_lote=50,
+            taxa_juros=0.15,
             pregoes_volatilidade=30
         )
         
@@ -107,8 +108,8 @@ def main():
         executar_cenario(
             conn=conn,
             id_simulacao=ID_SIMULACAO,
-            limite_lote=200,
-            taxa_juros=0.06,
+            limite_lote=100,
+            taxa_juros=0.15,
             pregoes_volatilidade=30
         )
         
@@ -116,8 +117,8 @@ def main():
         executar_cenario(
             conn=conn,
             id_simulacao=ID_SIMULACAO,
-            limite_lote=300,
-            taxa_juros=0.06,
+            limite_lote=200,
+            taxa_juros=0.15,
             pregoes_volatilidade=30
         )
         

@@ -1,5 +1,6 @@
 import sys
 import os
+import numpy as np
 
 # Adiciona o diretório 'src' ao path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -9,7 +10,7 @@ from datetime import datetime
 from DeltaHedgeAjustePeloDia import DeltaHedgeAjustePeloDia
 
 def executar_cenario(conn: sqlite3.Connection, id_simulacao: int, frequencia_ajuste: int = 1,
-                    taxa_juros: float = 0.06, pregoes_volatilidade: int = 30, arquivo_saida=None):
+                    taxa_juros: float = 0.15, pregoes_volatilidade: int = 30, arquivo_saida=None):
     """
     Executa um cenário de simulação de delta hedge.
     
@@ -118,7 +119,7 @@ def executar_cenarios_para_simulacao(conn: sqlite3.Connection, id_simulacao: int
                 conn=conn,
                 id_simulacao=id_simulacao,
                 frequencia_ajuste=frequencia,
-                taxa_juros=0.06,
+                taxa_juros=0.15,
                 pregoes_volatilidade=pregoes,
                 arquivo_saida=arquivo_saida
             )

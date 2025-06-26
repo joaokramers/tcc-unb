@@ -1,5 +1,6 @@
 import sys
 import os
+import numpy as np
 
 # Adiciona o diretório 'src' ao path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -11,7 +12,7 @@ from helper.TradeHelper import TradeHelper
 
 class DeltaHedgeAjustePeloDia:
     def __init__(self, conn: sqlite3.Connection, id_simulacao: int, frequencia_ajuste: int = 1, 
-                 taxa_juros: float = 0.06, pregoes_volatilidade: int = 30):
+                 taxa_juros: float = 0.15, pregoes_volatilidade: int = 30):
         """
         Inicializa a classe DeltaHedge.
         
@@ -19,7 +20,7 @@ class DeltaHedgeAjustePeloDia:
             conn: Conexão com o banco de dados SQLite
             id_simulacao: ID da simulação na tabela SIMULACAO
             frequencia_ajuste: Frequência de ajuste em dias (padrão: 1 dia)
-            taxa_juros: Taxa de juros anual (padrão: 6%)
+            taxa_juros: Taxa de juros anual (padrão: 15%)
             pregoes_volatilidade: Número de pregões para cálculo da volatilidade (padrão: 30)
         """
         self.conn = conn
@@ -84,9 +85,9 @@ class DeltaHedgeAjustePeloDia:
         """
         cursor = self.conn.cursor()
         
-        # Recupera preços da opção
+        # Recupera preços da opção (abertura e fechamento)
         cursor.execute("""
-            SELECT h.data, h.abertura
+            SELECT h.data, h.abertura, h.fechamento
             FROM HIST_OPCAO h
             JOIN OPCAO o ON h.id_opcao = o.id
             WHERE o.id = ?
@@ -96,9 +97,9 @@ class DeltaHedgeAjustePeloDia:
         
         self.precos_opcao = cursor.fetchall()
         
-        # Recupera preços do ativo
+        # Recupera preços do ativo (abertura e fechamento)
         cursor.execute("""
-            SELECT h.data, h.abertura
+            SELECT h.data, h.abertura, h.fechamento
             FROM HIST_ATIVO h
             JOIN ATIVO a ON h.id_ativo = a.id
             WHERE a.id = ?
@@ -138,7 +139,7 @@ class DeltaHedgeAjustePeloDia:
         self.datas_ajuste_real = []  # Lista para armazenar as datas onde realmente houve ajuste
         self.qtd_acoes = []     # Lista para armazenar a quantidade de ações
         
-        for i, (data_str, preco_ativo) in enumerate(self.precos_ativo):
+        for i, (data_str, preco_ativo_abertura, preco_ativo_fechamento) in enumerate(self.precos_ativo):
             # Converte a data para datetime.date
             data = datetime.strptime(data_str, "%Y-%m-%d").date()
             
@@ -166,10 +167,10 @@ class DeltaHedgeAjustePeloDia:
                 data_str
             )
             
-            # Calcula o delta da call
+            # Calcula o delta da call usando preço de abertura
             delta = TradeHelper.calcular_delta(
                 opcao='call',
-                S=preco_ativo,
+                S=preco_ativo_abertura,
                 K=self.preco_exercicio,
                 T=tempo_anualizado,
                 r=self.taxa_juros,
@@ -186,9 +187,9 @@ class DeltaHedgeAjustePeloDia:
                 diferenca = qtd_acoes  # Diferença é a quantidade total pois começamos do zero
                 self.diferenca_delta.append(diferenca)
                 
-                # Vende opções e compra ações
+                # Vende opções e compra ações usando preços de abertura
                 valor_opcoes = self.quantidade_opcoes * self.precos_opcao[i][1]  # Valor recebido pela venda das opções
-                valor_acoes = diferenca * preco_ativo  # Valor gasto na compra das ações
+                valor_acoes = diferenca * preco_ativo_abertura  # Valor gasto na compra das ações
                 ajuste = valor_opcoes - valor_acoes  # Saldo inicial
                 
                 # Primeiro dia sempre é ajuste
@@ -201,8 +202,8 @@ class DeltaHedgeAjustePeloDia:
                     qtd_acoes_anterior = self.qtd_acoes[-1]
                     qtd_acoes_nova = delta * self.quantidade_opcoes
                     diferenca = qtd_acoes_nova - qtd_acoes_anterior
-                    # Calcula o ajuste no saldo
-                    ajuste = -diferenca * preco_ativo  # Negativo porque se comprar gasta, se vender recebe
+                    # Calcula o ajuste no saldo usando preço de abertura
+                    ajuste = -diferenca * preco_ativo_abertura  # Negativo porque se comprar gasta, se vender recebe
                     
                     # Registra a data de ajuste real
                     self.datas_ajuste_real.append(data)
@@ -246,8 +247,8 @@ class DeltaHedgeAjustePeloDia:
         # Cria um DataFrame com os dados
         df = pd.DataFrame({
             'Data': [row[0] for row in self.precos_ativo],
-            'Ativo': [row[1] for row in self.precos_ativo],
-            'Opção': [row[1] for row in self.precos_opcao],
+            'Ativo': [row[1] for row in self.precos_ativo],  # Preço de abertura
+            'Opção': [row[1] for row in self.precos_opcao],  # Preço de abertura
             'Delta': self.deltas,
             'PregõesVencimento': [TradeHelper.calcular_dias_uteis(
                 self.conn,
@@ -262,10 +263,14 @@ class DeltaHedgeAjustePeloDia:
             'Ajuste': [datetime.strptime(data, "%Y-%m-%d").date() in self.datas_ajuste_real for data in [row[0] for row in self.precos_ativo]]
         })
         
-        # Calcula o saldo real (saldo acumulado + valor das ações - valor das opções)
-        df['Saldo Real'] = df['Saldo Acumulado'] + (df['Qtd Ações'] * df['Ativo']) - (self.quantidade_opcoes * df['Opção'])
+        # Calcula o saldo real usando preços de fechamento (com float)
+        precos_fechamento_ativo = np.array([float(row[2]) for row in self.precos_ativo])
+        precos_fechamento_opcao = np.array([float(row[2]) for row in self.precos_opcao])
+        qtd_acoes = np.array(df['Qtd Ações'], dtype=float)
+        saldo_acumulado = np.array(df['Saldo Acumulado'], dtype=float)
+        df['Saldo Real'] = saldo_acumulado + (qtd_acoes * precos_fechamento_ativo) - (self.quantidade_opcoes * precos_fechamento_opcao)
         
-        # Formata as colunas numéricas
+        # Só depois formate as colunas numéricas
         df['Ativo'] = df['Ativo'].map('R$ {:.2f}'.format)
         df['Opção'] = df['Opção'].map('R$ {:.2f}'.format)
         df['Delta'] = df['Delta'].map('{:.4f}'.format)
@@ -349,7 +354,7 @@ if __name__ == "__main__":
             conn=conn,
             id_simulacao=id_simulacao,
             frequencia_ajuste=5,  # Ajuste a cada x dias
-            taxa_juros=0.06,      # 6% ao ano
+            taxa_juros=0.15,      # 15% ao ano
             pregoes_volatilidade=10  # x pregões para cálculo da volatilidade
         )
         
