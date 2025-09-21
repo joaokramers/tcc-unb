@@ -72,8 +72,8 @@ def gravar_dados_opcao():
         cursor.execute('DELETE FROM SIMULACAO')
         print("Tabelas limpas com sucesso!")
         
-        # Listar todos os arquivos CSV que começam com PETRE ou PETRF
-        arquivos = [f for f in os.listdir(diretorio) if (f.startswith('PETRE') or f.startswith('PETRF')) and f.endswith('.csv')]
+        # Listar todos os arquivos CSV que começam com PETRE, PETRF, PETRG, PETRH, PETRI ou PETRJ
+        arquivos = [f for f in os.listdir(diretorio) if (f.startswith('PETRE') or f.startswith('PETRF') or f.startswith('PETRG') or f.startswith('PETRH') or f.startswith('PETRI') or f.startswith('PETRJ')) and f.endswith('.csv')]
         
         for arquivo in arquivos:
             # Extrair informações do nome do arquivo
