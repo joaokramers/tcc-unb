@@ -104,11 +104,12 @@ def gravar_dados_opcao():
             
             # Determinar data de início e fim para a simulação
             data_vencimento = datetime.strptime(vencimento, '%Y-%m-%d').date()
-            ano_vencimento = data_vencimento.year
+            
+            # Converter todas as datas disponíveis para objetos date
+            datas_disponiveis = [datetime.strptime(data, '%Y-%m-%d').date() for data, _, _, _, _ in dados_historicos]
+            datas_disponiveis.sort()  # Ordenar as datas
             
             # Data de término: último dia antes do vencimento com negociação
-            # Buscar todas as datas disponíveis e encontrar a última antes do vencimento
-            datas_disponiveis = [datetime.strptime(data, '%Y-%m-%d').date() for data, _, _, _, _ in dados_historicos]
             datas_antes_vencimento = [data for data in datas_disponiveis if data < data_vencimento]
             
             if datas_antes_vencimento:
@@ -117,16 +118,29 @@ def gravar_dados_opcao():
                 # Se não encontrar datas antes do vencimento, usar a última data disponível
                 data_termino = max(datas_disponiveis) if datas_disponiveis else None
             
-            # Data de início: primeiro dia do ano do vencimento com negociação
-            # Buscar a primeira data disponível no ano do vencimento
-            datas_ano = [data for data, _, _, _, _ in dados_historicos 
-                        if datetime.strptime(data, '%Y-%m-%d').year == ano_vencimento]
-            
-            if datas_ano:
-                data_inicio = min(datas_ano)
+            # Data de início: 30 pregões antes da data de término
+            if data_termino and len(datas_disponiveis) > 0:
+                # Encontrar a posição da data de término na lista ordenada
+                try:
+                    posicao_termino = datas_disponiveis.index(data_termino)
+                    # Calcular posição de início (30 pregões antes)
+                    posicao_inicio = max(0, posicao_termino - 29)  # 29 porque incluímos a data de término
+                    data_inicio = datas_disponiveis[posicao_inicio]
+                    
+                    # Debug: mostrar informações do cálculo
+                    pregones_entre_datas = posicao_termino - posicao_inicio + 1
+                    print(f"    DEBUG: Posição término: {posicao_termino}, Posição início: {posicao_inicio}")
+                    print(f"    DEBUG: Pregões entre datas: {pregones_entre_datas}")
+                    print(f"    DEBUG: Data início calculada: {data_inicio}")
+                    print(f"    DEBUG: Data término: {data_termino}")
+                    
+                except ValueError:
+                    # Se não encontrar a data de término, usar a primeira data disponível
+                    data_inicio = datas_disponiveis[0] if datas_disponiveis else None
+                    print(f"    DEBUG: Data de término não encontrada na lista, usando primeira data: {data_inicio}")
             else:
-                # Se não encontrar dados no ano do vencimento, usar a primeira data disponível
-                data_inicio = dados_historicos[0][0] if dados_historicos else None
+                data_inicio = None
+                print(f"    DEBUG: Não foi possível calcular data de início")
             
             if data_inicio and data_termino:
                 # Inserir simulação
@@ -135,9 +149,12 @@ def gravar_dados_opcao():
                     VALUES (?, ?, ?, ?, ?)
                 ''', (id_opcao, 1000, 'DH', data_inicio, data_termino.strftime('%Y-%m-%d')))
                 
+                # Calcular quantos pregões estão na simulação
+                pregones_simulacao = len([d for d in datas_disponiveis if data_inicio <= d <= data_termino])
+                
                 print(f"Opção inserida: {ticker} - Strike: {strike} - Vencimento: {vencimento}")
                 print(f"  - {len(dados_historicos)} registros históricos inseridos")
-                print(f"  - Simulação criada: {data_inicio} até {data_termino}")
+                print(f"  - Simulação criada: {data_inicio} até {data_termino} ({pregones_simulacao} pregões)")
             else:
                 print(f"Erro: Não foi possível determinar datas para {ticker}")
         

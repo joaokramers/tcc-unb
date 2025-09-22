@@ -46,9 +46,9 @@ class DeltaHedgeAjustePeloLote:
         self.id_opcao = simulacao[2]
         self.quantidade_opcoes = simulacao[3]  # Quantidade de opções a serem vendidas
         
-        # Recupera o preço de exercício, ID do ativo, ticker do ativo e data de vencimento da opção
+        # Recupera o preço de exercício, ID do ativo, ticker do ativo, ticker da opção e data de vencimento da opção
         cursor.execute("""
-            SELECT o.strike, o.id_ativo, a.ticker, o.vencimento
+            SELECT o.strike, o.id_ativo, a.ticker, o.ticker, o.vencimento
             FROM OPCAO o
             JOIN ATIVO a ON a.id = o.id_ativo
             WHERE o.id = ?
@@ -61,7 +61,8 @@ class DeltaHedgeAjustePeloLote:
         self.preco_exercicio = opcao[0]
         self.id_ativo = opcao[1]
         self.ticker_ativo = opcao[2]
-        self.data_vencimento = datetime.strptime(opcao[3], "%Y-%m-%d").date()
+        self.ticker_opcao = opcao[3]  # Ticker da opção (ex: PETRI201)
+        self.data_vencimento = datetime.strptime(opcao[4], "%Y-%m-%d").date()
         
         # Inicializa as listas de preços e datas
         self.precos_opcao = []
@@ -117,7 +118,47 @@ class DeltaHedgeAjustePeloLote:
         datas_ativo = [row[0] for row in self.precos_ativo]
         
         if datas_opcao != datas_ativo:
-            raise ValueError("As datas dos preços da opção e do ativo não correspondem.")
+            # Debug: mostra informações detalhadas do erro
+            print(f"\n=== ERRO DE SINCRONIZAÇÃO DE DATAS ===")
+            print(f"Opção: {self.ticker_opcao} (ID: {self.id_opcao})")
+            print(f"Ativo: {self.ticker_ativo}")
+            print(f"Período: {self.data_inicio} até {self.data_termino}")
+            print(f"Total datas opção: {len(datas_opcao)}")
+            print(f"Total datas ativo: {len(datas_ativo)}")
+            
+            # Mostra primeiras e últimas datas de cada
+            print(f"\nPrimeiras 5 datas da OPÇÃO:")
+            for i, data in enumerate(datas_opcao[:5]):
+                print(f"  {i+1}: {data}")
+            
+            print(f"\nPrimeiras 5 datas do ATIVO:")
+            for i, data in enumerate(datas_ativo[:5]):
+                print(f"  {i+1}: {data}")
+                
+            # Encontra datas diferentes
+            datas_opcao_set = set(datas_opcao)
+            datas_ativo_set = set(datas_ativo)
+            
+            apenas_opcao = datas_opcao_set - datas_ativo_set
+            apenas_ativo = datas_ativo_set - datas_opcao_set
+            
+            if apenas_opcao:
+                print(f"\nDatas que existem APENAS na opção ({len(apenas_opcao)}):")
+                for data in sorted(list(apenas_opcao))[:10]:  # Mostra até 10
+                    print(f"  {data}")
+                if len(apenas_opcao) > 10:
+                    print(f"  ... e mais {len(apenas_opcao) - 10} datas")
+                    
+            if apenas_ativo:
+                print(f"\nDatas que existem APENAS no ativo ({len(apenas_ativo)}):")
+                for data in sorted(list(apenas_ativo))[:10]:  # Mostra até 10
+                    print(f"  {data}")
+                if len(apenas_ativo) > 10:
+                    print(f"  ... e mais {len(apenas_ativo) - 10} datas")
+            
+            print(f"\n{'='*50}\n")
+            
+            raise ValueError(f"As datas dos preços da opção e do ativo não correspondem. Opção: {self.ticker_opcao} (ID: {self.id_opcao})")
 
     def processar(self):
         """
