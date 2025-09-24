@@ -1,0 +1,117 @@
+ESTATÍSTICAS DESCRITIVAS - DELTA HEDGE AJUSTE POR LOTE
+============================================================
+
+ESTATÍSTICAS GERAIS:
+Total de observações: 416
+Saldo Final - Média: R$ 300.77
+Saldo Final - Mediana: R$ 384.92
+Saldo Final - Desvio Padrão: R$ 467.21
+Saldo Final - Mínimo: R$ -1330.38
+Saldo Final - Máximo: R$ 1364.07
+
+POR CATEGORIA DE SIMULAÇÃO:
+----------------------------------------
+
+ATM → ITM:
+  Observações: 104
+  Média: R$ -27.54
+  Mediana: R$ 328.48
+  Desvio Padrão: R$ 621.71
+
+ATM → ATM:
+  Observações: 36
+  Média: R$ 478.92
+  Mediana: R$ 398.84
+  Desvio Padrão: R$ 327.04
+
+ATM → OTM:
+  Observações: 56
+  Média: R$ 628.72
+  Mediana: R$ 508.96
+  Desvio Padrão: R$ 308.76
+
+OTM → OTM:
+  Observações: 136
+  Média: R$ 243.34
+  Mediana: R$ 228.07
+  Desvio Padrão: R$ 323.63
+
+ITM → ITM:
+  Observações: 64
+  Média: R$ 430.01
+  Mediana: R$ 419.37
+  Desvio Padrão: R$ 222.37
+
+ITM → ATM:
+  Observações: 8
+  Média: R$ 889.56
+  Mediana: R$ 845.91
+  Desvio Padrão: R$ 232.62
+
+OTM → ITM:
+  Observações: 8
+  Média: R$ 648.17
+  Mediana: R$ 662.31
+  Desvio Padrão: R$ 51.64
+
+OTM → ATM:
+  Observações: 4
+  Média: R$ 654.44
+  Mediana: R$ 669.01
+  Desvio Padrão: R$ 48.56
+
+
+POR LIMITE DE LOTE:
+----------------------------------------
+
+Limite 50 ações:
+  Observações: 104
+  Média: R$ 257.65
+  Mediana: R$ 397.83
+  Desvio Padrão: R$ 436.83
+
+Limite 100 ações:
+  Observações: 104
+  Média: R$ 294.78
+  Mediana: R$ 384.92
+  Desvio Padrão: R$ 415.01
+
+Limite 200 ações:
+  Observações: 104
+  Média: R$ 278.91
+  Mediana: R$ 328.48
+  Desvio Padrão: R$ 439.77
+
+Limite 300 ações:
+  Observações: 104
+  Média: R$ 371.72
+  Mediana: R$ 466.78
+  Desvio Padrão: R$ 561.77
+
+
+POR PERÍODO DE VOLATILIDADE:
+----------------------------------------
+
+30 pregões:
+  Observações: 104
+  Média: R$ 310.51
+  Mediana: R$ 395.76
+  Desvio Padrão: R$ 456.20
+
+60 pregões:
+  Observações: 104
+  Média: R$ 316.86
+  Mediana: R$ 410.03
+  Desvio Padrão: R$ 462.42
+
+120 pregões:
+  Observações: 104
+  Média: R$ 285.62
+  Mediana: R$ 347.59
+  Desvio Padrão: R$ 477.28
+
+252 pregões:
+  Observações: 104
+  Média: R$ 290.08
+  Mediana: R$ 378.57
+  Desvio Padrão: R$ 478.60

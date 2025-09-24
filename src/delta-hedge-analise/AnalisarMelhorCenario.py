@@ -146,12 +146,12 @@ def main():
                 'Término': melhor_cenario['Término'],
                 'PETR-Início': preco_inicio,
                 'PETR-Término': preco_fim,
-                'D.Inicial': melhor_cenario['D.Inicial'],
-                'D.Final': melhor_cenario['D.Final'],
+                'Δ Inicio': melhor_cenario['Δ Inicio'],
+                'Δ Fim': melhor_cenario['Δ Fim'],
                 'Simulação': melhor_cenario['Simulação'],
                 'Ajuste': melhor_cenario['Ajuste'],
                 'Valor': melhor_cenario['Valor'],
-                'Pregões Volatilidade': melhor_cenario['Pregões Volatilidade'],
+                '# Pregões Vol.': melhor_cenario['# Pregões Vol.'],
                 '# Ajustes': melhor_cenario['# Ajustes'],
                 'Saldo Final': melhor_cenario['Saldo Final'],
                 'Melhor Saldo': melhor_cenario['Melhor Saldo'],
@@ -168,7 +168,7 @@ def main():
                 x if isinstance(x, str) and x.startswith('R$') else 
                 f'R$ {x:.2f}' if pd.notnull(x) and x != 'N/A' else 'N/A'
             )
-        for col in ['D.Inicial', 'D.Final']:
+        for col in ['Δ Inicio', 'Δ Fim']:
             df_final[col] = df_final[col].apply(lambda x: 
                 f'{float(x):.4f}' if pd.notnull(x) and x != 'N/A' and not isinstance(x, str) else 
                 x if isinstance(x, str) and not x.startswith('R$') else 

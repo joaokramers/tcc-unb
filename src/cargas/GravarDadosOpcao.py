@@ -118,26 +118,30 @@ def gravar_dados_opcao():
                 # Se não encontrar datas antes do vencimento, usar a última data disponível
                 data_termino = max(datas_disponiveis) if datas_disponiveis else None
             
-            # Data de início: 30 pregões antes da data de término
+            # Data de início: 1 mês antes da data de término
             if data_termino and len(datas_disponiveis) > 0:
-                # Encontrar a posição da data de término na lista ordenada
-                try:
-                    posicao_termino = datas_disponiveis.index(data_termino)
-                    # Calcular posição de início (30 pregões antes)
-                    posicao_inicio = max(0, posicao_termino - 29)  # 29 porque incluímos a data de término
-                    data_inicio = datas_disponiveis[posicao_inicio]
-                    
-                    # Debug: mostrar informações do cálculo
-                    pregones_entre_datas = posicao_termino - posicao_inicio + 1
-                    print(f"    DEBUG: Posição término: {posicao_termino}, Posição início: {posicao_inicio}")
-                    print(f"    DEBUG: Pregões entre datas: {pregones_entre_datas}")
-                    print(f"    DEBUG: Data início calculada: {data_inicio}")
-                    print(f"    DEBUG: Data término: {data_termino}")
-                    
-                except ValueError:
-                    # Se não encontrar a data de término, usar a primeira data disponível
+                # Calcular data de início (1 mês antes da data de término)
+                # Aproximação: 1 mês = aproximadamente 30 dias
+                data_inicio_calculada = data_termino - timedelta(days=30)
+                
+                # Encontrar a data disponível mais próxima (mas não anterior) à data calculada
+                datas_apos_inicio = [data for data in datas_disponiveis if data >= data_inicio_calculada]
+                
+                if datas_apos_inicio:
+                    data_inicio = min(datas_apos_inicio)
+                else:
+                    # Se não encontrar datas após a data calculada, usar a primeira data disponível
                     data_inicio = datas_disponiveis[0] if datas_disponiveis else None
-                    print(f"    DEBUG: Data de término não encontrada na lista, usando primeira data: {data_inicio}")
+                
+                # Debug: mostrar informações do cálculo
+                if data_inicio:
+                    pregones_entre_datas = len([d for d in datas_disponiveis if data_inicio <= d <= data_termino])
+                    print(f"    DEBUG: Data término: {data_termino}")
+                    print(f"    DEBUG: Data início calculada (1 mês antes): {data_inicio_calculada}")
+                    print(f"    DEBUG: Data início final: {data_inicio}")
+                    print(f"    DEBUG: Pregões entre datas: {pregones_entre_datas}")
+                else:
+                    print(f"    DEBUG: Não foi possível encontrar data de início")
             else:
                 data_inicio = None
                 print(f"    DEBUG: Não foi possível calcular data de início")

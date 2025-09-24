@@ -38,11 +38,23 @@ def executar_cenario(conn: sqlite3.Connection, id_simulacao: int, limite_lote: i
         data_inicio = datetime.strptime(simulacao[1], "%Y-%m-%d").date()
         data_termino = datetime.strptime(simulacao[2], "%Y-%m-%d").date()
         
+        # Busca o preço de fechamento do último dia de negociação
+        cursor.execute("""
+            SELECT fechamento FROM HIST_ATIVO 
+            WHERE id_ativo = 1 AND data = ?
+        """, (data_termino.strftime('%Y-%m-%d'),))
+        
+        preco_fechamento_result = cursor.fetchone()
+        preco_fechamento = preco_fechamento_result[0] if preco_fechamento_result else None
+        
         resultado = f"\nTestando DeltaHedgeAjustePeloLote com simulação ID {id_simulacao}\n"
         resultado += f"Período: {data_inicio} até {data_termino}\n"
         resultado += f"Limite de Lote para Ajuste: {limite_lote}\n"
         resultado += f"Taxa de Juros: {taxa_juros*100:.1f}%\n"
         resultado += f"Pregões de Volatilidade: {pregoes_volatilidade}\n"
+        if preco_fechamento:
+            resultado += f"Preço de Fechamento (último dia): R$ {preco_fechamento:.2f}\n"
+            resultado += f"NOTA: Delta final e ajustes no último dia usam preço de FECHAMENTO\n"
         resultado += "=" * 80 + "\n"
         
         print(resultado)

@@ -1,0 +1,111 @@
+ESTATÍSTICAS DESCRITIVAS - DELTA HEDGE AJUSTE POR DELTA
+============================================================
+
+ESTATÍSTICAS GERAIS:
+Total de observações: 312
+Saldo Final - Média: R$ 333.53
+Saldo Final - Mediana: R$ 370.78
+Saldo Final - Desvio Padrão: R$ 459.87
+Saldo Final - Mínimo: R$ -1307.97
+Saldo Final - Máximo: R$ 1240.99
+
+POR CATEGORIA DE SIMULAÇÃO:
+----------------------------------------
+
+ATM → ITM:
+  Observações: 78
+  Média: R$ -13.17
+  Mediana: R$ 253.91
+  Desvio Padrão: R$ 614.90
+
+ATM → ATM:
+  Observações: 27
+  Média: R$ 543.57
+  Mediana: R$ 533.52
+  Desvio Padrão: R$ 292.78
+
+ATM → OTM:
+  Observações: 42
+  Média: R$ 682.98
+  Mediana: R$ 658.46
+  Desvio Padrão: R$ 261.13
+
+OTM → OTM:
+  Observações: 102
+  Média: R$ 285.31
+  Mediana: R$ 224.41
+  Desvio Padrão: R$ 311.68
+
+ITM → ITM:
+  Observações: 48
+  Média: R$ 441.55
+  Mediana: R$ 389.93
+  Desvio Padrão: R$ 208.58
+
+ITM → ATM:
+  Observações: 6
+  Média: R$ 910.04
+  Mediana: R$ 810.76
+  Desvio Padrão: R$ 226.90
+
+OTM → ITM:
+  Observações: 6
+  Média: R$ 655.50
+  Mediana: R$ 710.29
+  Desvio Padrão: R$ 91.21
+
+OTM → ATM:
+  Observações: 3
+  Média: R$ 678.92
+  Mediana: R$ 717.35
+  Desvio Padrão: R$ 70.02
+
+
+POR LIMITE DE DELTA:
+----------------------------------------
+
+Limite 0.05:
+  Observações: 104
+  Média: R$ 263.76
+  Mediana: R$ 347.73
+  Desvio Padrão: R$ 411.73
+
+Limite 0.1:
+  Observações: 104
+  Média: R$ 355.81
+  Mediana: R$ 378.48
+  Desvio Padrão: R$ 458.82
+
+Limite 0.15:
+  Observações: 104
+  Média: R$ 381.01
+  Mediana: R$ 451.78
+  Desvio Padrão: R$ 500.81
+
+
+POR PERÍODO DE VOLATILIDADE:
+----------------------------------------
+
+30 pregões:
+  Observações: 78
+  Média: R$ 343.65
+  Mediana: R$ 420.31
+  Desvio Padrão: R$ 483.20
+
+60 pregões:
+  Observações: 78
+  Média: R$ 353.45
+  Mediana: R$ 361.35
+  Desvio Padrão: R$ 420.97
+
+120 pregões:
+  Observações: 78
+  Média: R$ 314.67
+  Mediana: R$ 335.87
+  Desvio Padrão: R$ 469.31
+
+252 pregões:
+  Observações: 78
+  Média: R$ 322.35
+  Mediana: R$ 347.73
+  Desvio Padrão: R$ 471.39

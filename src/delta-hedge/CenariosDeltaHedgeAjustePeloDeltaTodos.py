@@ -38,11 +38,23 @@ def executar_cenario(conn: sqlite3.Connection, id_simulacao: int, limite_delta: 
         data_inicio = datetime.strptime(simulacao[1], "%Y-%m-%d").date()
         data_termino = datetime.strptime(simulacao[2], "%Y-%m-%d").date()
         
+        # Busca o preço de fechamento do último dia de negociação
+        cursor.execute("""
+            SELECT fechamento FROM HIST_ATIVO 
+            WHERE id_ativo = 1 AND data = ?
+        """, (data_termino.strftime('%Y-%m-%d'),))
+        
+        preco_fechamento_result = cursor.fetchone()
+        preco_fechamento = preco_fechamento_result[0] if preco_fechamento_result else None
+        
         resultado = f"\nTestando DeltaHedgeAjustePeloDelta com simulação ID {id_simulacao}\n"
         resultado += f"Período: {data_inicio} até {data_termino}\n"
         resultado += f"Limite de Delta para Ajuste: {limite_delta}\n"
         resultado += f"Taxa de Juros: {taxa_juros*100:.1f}%\n"
         resultado += f"Pregões de Volatilidade: {pregoes_volatilidade}\n"
+        if preco_fechamento:
+            resultado += f"Preço de Fechamento (último dia): R$ {preco_fechamento:.2f}\n"
+            resultado += f"NOTA: Delta final e ajustes no último dia usam preço de FECHAMENTO\n"
         resultado += "=" * 80 + "\n"
         
         print(resultado)
@@ -145,7 +157,7 @@ def main():
             # Lista todas as simulações disponíveis
             cursor = conn.cursor()
             cursor.execute("""
-                SELECT s.id, s.data_inicio, s.data_termino, o.ticker, o.strike, o.vencimento
+                SELECT s.id, s.data_inicio, s.data_termino, o.ticker, o.strike, o.vencimento, s.id_opcao
                 FROM SIMULACAO s
                 JOIN OPCAO o ON o.id = s.id_opcao
                 ORDER BY s.id ASC
@@ -156,12 +168,24 @@ def main():
                 raise ValueError("Nenhuma simulação encontrada no banco de dados.")
             
             info_simulacoes = "\nSimulações disponíveis:\n"
-            info_simulacoes += "=" * 80 + "\n"
+            info_simulacoes += "=" * 100 + "\n"
+            info_simulacoes += f"{'ID':<5} {'Opção':<12} {'Strike':<10} {'Valor Opção':<12} {'Período':<25} {'Vencimento':<12}\n"
+            info_simulacoes += "-" * 100 + "\n"
+            
             for sim in simulacoes:
-                info_simulacoes += f"ID: {sim[0]}\n"
-                info_simulacoes += f"Período: {sim[1]} até {sim[2]}\n"
-                info_simulacoes += f"Opção: {sim[3]} - Strike: R$ {sim[4]:.2f} - Vencimento: {sim[5]}\n"
-                info_simulacoes += "-" * 80 + "\n"
+                # Busca o preço da opção no primeiro dia (data de início)
+                cursor.execute("""
+                    SELECT fechamento
+                    FROM HIST_OPCAO
+                    WHERE id_opcao = ? AND data = ?
+                    ORDER BY data ASC
+                    LIMIT 1
+                """, (sim[6], sim[1]))  # sim[6] é o id_opcao
+                
+                preco_opcao = cursor.fetchone()
+                valor_opcao = f"R$ {preco_opcao[0]:.2f}" if preco_opcao else "N/A"
+                
+                info_simulacoes += f"{sim[0]:<5} {sim[3]:<12} R$ {sim[4]:<8.2f} {valor_opcao:<12} {sim[1]} até {sim[2]:<12} {sim[5]:<12}\n"
             
             info_simulacoes += f"\nTotal de simulações encontradas: {len(simulacoes)}\n"
             info_simulacoes += f"Executando cenários para todas as simulações...\n\n"

@@ -9,8 +9,10 @@ from openpyxl.utils import get_column_letter
 def extrair_dados_simulacao(arquivo_txt):
     """
     Extrai os dados das simulações do arquivo de texto.
+    Retorna: (simulacoes_melhor_cenario, todos_cenarios)
     """
     simulacoes = []
+    todos_cenarios = []
     
     with open(arquivo_txt, 'r', encoding='utf-8') as f:
         conteudo = f.read()
@@ -125,7 +127,7 @@ def extrair_dados_simulacao(arquivo_txt):
                     if data_saldo_pairs:
                         data_melhor_saldo, melhor_saldo = max(data_saldo_pairs, key=lambda item: item[1])
                 
-                cenarios.append({
+                cenario_data = {
                     'frequencia_ajuste': frequencia_ajuste,
                     'pregoes_volatilidade': pregoes_volatilidade,
                     'num_ajustes': num_ajustes,
@@ -134,9 +136,21 @@ def extrair_dados_simulacao(arquivo_txt):
                     'delta_final': delta_final,
                     'melhor_saldo': melhor_saldo if melhor_saldo != -float('inf') else None,
                     'data_melhor_saldo': data_melhor_saldo
+                }
+                cenarios.append(cenario_data)
+                
+                # Adiciona todos os cenários para a aba "Todos"
+                todos_cenarios.append({
+                    'id_simulacao': id_simulacao,
+                    'ticker': ticker,
+                    'strike': strike,
+                    'vencimento': vencimento,
+                    'data_inicio': data_inicio,
+                    'data_termino': data_termino,
+                    **cenario_data
                 })
             
-            # Pega o melhor cenário (maior saldo final)
+            # Pega o melhor cenário (maior saldo final) para a aba principal
             if cenarios:
                 melhor_cenario = max(cenarios, key=lambda x: x['saldo_final'])
                 print(f"Melhor cenário: Frequência={melhor_cenario['frequencia_ajuste']}, Vol={melhor_cenario['pregoes_volatilidade']}, Saldo=R$ {melhor_cenario['saldo_final']:.2f}")
@@ -164,7 +178,7 @@ def extrair_dados_simulacao(arquivo_txt):
             print(f"Erro ao processar simulação {i}: {str(e)}")
             continue
     
-    return simulacoes
+    return simulacoes, todos_cenarios
 
 def obter_precos_petrobras(conn, data_inicio, data_termino):
     """
@@ -180,9 +194,9 @@ def obter_precos_petrobras(conn, data_inicio, data_termino):
         """, (data_inicio,))
         preco_inicio = cursor.fetchone()
         
-        # Busca preço no fim
+        # Busca preço no fim (fechamento do último dia)
         cursor.execute("""
-            SELECT abertura FROM HIST_ATIVO 
+            SELECT fechamento FROM HIST_ATIVO 
             WHERE id_ativo = 1 AND data = ?
         """, (data_termino,))
         preco_fim = cursor.fetchone()
@@ -228,13 +242,14 @@ def main():
     
     try:
         print("Analisando arquivo de simulações...")
-        simulacoes = extrair_dados_simulacao(arquivo_txt)
+        simulacoes, todos_cenarios = extrair_dados_simulacao(arquivo_txt)
         
         if not simulacoes:
             print("Nenhuma simulação encontrada no arquivo.")
             return
         
         print(f"Encontradas {len(simulacoes)} simulações para sumarizar.")
+        print(f"Total de cenários (todas as combinações): {len(todos_cenarios)}")
         
         # Cria DataFrame com os dados
         dados = []
@@ -245,6 +260,20 @@ def main():
                 conn, sim['data_inicio'], sim['data_termino']
             )
             
+            # Obtém valor da opção no primeiro dia
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT h.fechamento
+                FROM HIST_OPCAO h
+                JOIN OPCAO o ON o.id = h.id_opcao
+                WHERE o.ticker = ? AND h.data = ?
+                ORDER BY h.data ASC
+                LIMIT 1
+            """, (sim['ticker'], sim['data_inicio']))
+            
+            valor_opcao_result = cursor.fetchone()
+            valor_opcao = valor_opcao_result[0] if valor_opcao_result else None
+            
             # Determina situação da opção baseada no Delta
             situacao = determinar_situacao_delta(sim['delta_inicial'], sim['delta_final'])
             
@@ -252,15 +281,16 @@ def main():
                 'Opção': sim['ticker'],
                 'Vencimento': sim['vencimento'],
                 'Strike': sim['strike'],
+                'Preço': valor_opcao,
                 'Início': sim['data_inicio'],
                 'Término': sim['data_termino'],
                 'PETR-Início': preco_inicio,
                 'PETR-Término': preco_fim,
-                'D.Inicial': sim['delta_inicial'],
-                'D.Final': sim['delta_final'],
+                'Δ Inicio': sim['delta_inicial'],
+                'Δ Fim': sim['delta_final'],
                 'Simulação': situacao,
                 'Freq.Ajuste': sim['frequencia_ajuste'],
-                'Pregões Volatilidade': sim['pregoes_volatilidade'],
+                '# Pregões Vol.': sim['pregoes_volatilidade'],
                 '# Ajustes': sim['num_ajustes'],
                 'Saldo Final': sim['saldo_final'],
                 'Melhor Saldo': sim['melhor_saldo'],
@@ -271,13 +301,69 @@ def main():
         df = pd.DataFrame(dados)
         
         # Formatação das colunas
-        for col in ['Strike', 'PETR-Início', 'PETR-Término', 'Melhor Saldo', 'Saldo Final']:
+        for col in ['Strike', 'Preço', 'PETR-Início', 'PETR-Término', 'Melhor Saldo', 'Saldo Final']:
             df[col] = df[col].apply(lambda x: f'R$ {x:.2f}' if pd.notnull(x) else 'N/A')
-        for col in ['D.Inicial', 'D.Final']:
+        for col in ['Δ Inicio', 'Δ Fim']:
             df[col] = df[col].apply(lambda x: f'{x:.4f}' if pd.notnull(x) else 'N/A')
+        
+        # Cria DataFrame para todos os cenários
+        dados_todos = []
+        
+        for cenario in todos_cenarios:
+            # Obtém preços da Petrobras
+            preco_inicio, preco_fim = obter_precos_petrobras(
+                conn, cenario['data_inicio'], cenario['data_termino']
+            )
+            
+            # Obtém valor da opção no primeiro dia
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT h.fechamento
+                FROM HIST_OPCAO h
+                JOIN OPCAO o ON o.id = h.id_opcao
+                WHERE o.ticker = ? AND h.data = ?
+                ORDER BY h.data ASC
+                LIMIT 1
+            """, (cenario['ticker'], cenario['data_inicio']))
+            
+            valor_opcao_result = cursor.fetchone()
+            valor_opcao = valor_opcao_result[0] if valor_opcao_result else None
+            
+            # Determina situação da opção baseada no Delta
+            situacao = determinar_situacao_delta(cenario['delta_inicial'], cenario['delta_final'])
+            
+            dados_todos.append({
+                'Opção': cenario['ticker'],
+                'Vencimento': cenario['vencimento'],
+                'Strike': cenario['strike'],
+                'Preço': valor_opcao,
+                'Início': cenario['data_inicio'],
+                'Término': cenario['data_termino'],
+                'PETR-Início': preco_inicio,
+                'PETR-Término': preco_fim,
+                'Δ Inicio': cenario['delta_inicial'],
+                'Δ Fim': cenario['delta_final'],
+                'Simulação': situacao,
+                'Freq.Ajuste': cenario['frequencia_ajuste'],
+                '# Pregões Vol.': cenario['pregoes_volatilidade'],
+                '# Ajustes': cenario['num_ajustes'],
+                'Saldo Final': cenario['saldo_final'],
+                'Melhor Saldo': cenario['melhor_saldo'],
+                'Data Melhor Saldo': cenario['data_melhor_saldo']
+            })
+        
+        # Cria DataFrame para todos os cenários
+        df_todos = pd.DataFrame(dados_todos)
+        
+        # Formatação das colunas para todos os cenários
+        for col in ['Strike', 'Preço', 'PETR-Início', 'PETR-Término', 'Melhor Saldo', 'Saldo Final']:
+            df_todos[col] = df_todos[col].apply(lambda x: f'R$ {x:.2f}' if pd.notnull(x) else 'N/A')
+        for col in ['Δ Inicio', 'Δ Fim']:
+            df_todos[col] = df_todos[col].apply(lambda x: f'{x:.4f}' if pd.notnull(x) else 'N/A')
         
         # Salva no Excel
         with pd.ExcelWriter(arquivo_excel, engine='openpyxl') as writer:
+            # Aba principal (melhor cenário de cada opção)
             df.to_excel(writer, sheet_name='SimulacaoPeloDia', index=False)
             worksheet = writer.sheets['SimulacaoPeloDia']
             
@@ -294,9 +380,31 @@ def main():
                 except (ValueError, TypeError):
                     # Se houver erro (ex: coluna vazia), usa um valor padrão
                     worksheet.column_dimensions[get_column_letter(col_idx)].width = 15
+            
+            # Aba "Todos" (todas as combinações)
+            df_todos.to_excel(writer, sheet_name='Todos', index=False)
+            worksheet_todos = writer.sheets['Todos']
+            
+            # Ajusta a largura das colunas para a aba "Todos"
+            for col_idx, col_name in enumerate(df_todos.columns, 1):
+                try:
+                    # Calcula o tamanho máximo do conteúdo da coluna
+                    max_len = df_todos[col_name].astype(str).map(len).max()
+                    # Compara com o tamanho do cabeçalho
+                    header_len = len(col_name)
+                    # Usa o maior valor + 2 de buffer
+                    column_width = max(max_len, header_len) + 2
+                    worksheet_todos.column_dimensions[get_column_letter(col_idx)].width = column_width
+                except (ValueError, TypeError):
+                    # Se houver erro (ex: coluna vazia), usa um valor padrão
+                    worksheet_todos.column_dimensions[get_column_letter(col_idx)].width = 15
 
         print(f"Tabela salva em: {arquivo_excel}")
         print(f"Total de simulações processadas: {len(simulacoes)}")
+        print(f"Total de cenários na aba 'Todos': {len(todos_cenarios)}")
+        print(f"Arquivo Excel criado com 2 abas:")
+        print(f"  - 'SimulacaoPeloDia': Melhor cenário de cada opção ({len(simulacoes)} registros)")
+        print(f"  - 'Todos': Todas as combinações de frequência e volatilidade ({len(todos_cenarios)} registros)")
         
         # Resumo
         saldos_finais = [s['saldo_final'] for s in simulacoes if s['saldo_final'] is not None]
@@ -306,6 +414,23 @@ def main():
             print(f"Melhor saldo final: R$ {max(saldos_finais):.2f}")
             print(f"Pior saldo final: R$ {min(saldos_finais):.2f}")
             print(f"Média de ajustes: {sum(s['num_ajustes'] for s in simulacoes) / len(simulacoes):.1f}")
+            
+        # Resumo da aba "Todos"
+        saldos_todos = [c['saldo_final'] for c in todos_cenarios if c['saldo_final'] is not None]
+        if saldos_todos:
+            print(f"\nResumo da aba 'Todos' (todas as combinações):")
+            print("=" * 80)
+            print(f"Melhor saldo final: R$ {max(saldos_todos):.2f}")
+            print(f"Pior saldo final: R$ {min(saldos_todos):.2f}")
+            print(f"Média de ajustes: {sum(c['num_ajustes'] for c in todos_cenarios) / len(todos_cenarios):.1f}")
+            
+            # Análise por frequência de ajuste
+            freq_unicas = sorted(set(c['frequencia_ajuste'] for c in todos_cenarios))
+            print(f"\nFrequências de Ajuste testadas: {freq_unicas}")
+            
+            # Análise por volatilidade
+            vols_unicos = sorted(set(c['pregoes_volatilidade'] for c in todos_cenarios))
+            print(f"Períodos de Volatilidade testados: {vols_unicos}")
         
     except Exception as e:
         print(f"Erro durante a análise: {str(e)}")

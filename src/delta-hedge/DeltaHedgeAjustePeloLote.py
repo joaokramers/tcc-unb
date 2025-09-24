@@ -196,10 +196,15 @@ class DeltaHedgeAjustePeloLote:
                 data_str
             )
             
-            # Calcula o delta da call usando preço de abertura
+            # No último dia, usa preço de fechamento para calcular o delta
+            # Nos demais dias, usa preço de abertura
+            eh_ultimo_dia = (data == self.data_termino)
+            preco_para_delta = preco_ativo_fechamento if eh_ultimo_dia else preco_ativo_abertura
+            
+            # Calcula o delta da call
             delta = TradeHelper.calcular_delta(
                 opcao='call',
-                S=preco_ativo_abertura,
+                S=preco_para_delta,
                 K=self.preco_exercicio,
                 T=tempo_anualizado,
                 r=self.taxa_juros,
@@ -224,16 +229,31 @@ class DeltaHedgeAjustePeloLote:
                 
             else:
                 # Dias seguintes: ajusta posição se a diferença absoluta na quantidade de ações for maior que o limite
+                # OU se for o último dia de negociação (data de término)
                 qtd_acoes_anterior = self.qtd_acoes[-1]
                 qtd_acoes_nova = delta * self.quantidade_opcoes
                 diferenca_absoluta_acoes = abs(qtd_acoes_nova - qtd_acoes_anterior)
+                eh_ultimo_dia = (data == self.data_termino)
                 
-                if diferenca_absoluta_acoes > self.limite_lote:
+                if diferenca_absoluta_acoes > self.limite_lote or eh_ultimo_dia:
                     # Realiza o ajuste
                     diferenca = qtd_acoes_nova - qtd_acoes_anterior
-                    # Calcula o ajuste no saldo usando preço de abertura
-                    ajuste = -diferenca * preco_ativo_abertura  # Negativo porque se comprar gasta, se vender recebe
+                    # No último dia, usa preço de fechamento para o ajuste
+                    # Nos demais dias, usa preço de abertura
+                    preco_para_ajuste = preco_ativo_fechamento if eh_ultimo_dia else preco_ativo_abertura
+                    ajuste = -diferenca * preco_para_ajuste  # Negativo porque se comprar gasta, se vender recebe
                     self.datas_ajuste.append(data)  # Registra a data de ajuste
+                    
+                    # Debug para último dia
+                    if eh_ultimo_dia:
+                        print(f"    AJUSTE OBRIGATÓRIO no último dia: {data}")
+                        print(f"    Usando preço de FECHAMENTO: R$ {preco_ativo_fechamento:.2f}")
+                        print(f"    Delta atual: {delta:.4f}")
+                        print(f"    Ações anterior: {qtd_acoes_anterior:.2f}, Ações nova: {qtd_acoes_nova:.2f}")
+                        print(f"    Diferença absoluta ações: {diferenca_absoluta_acoes:.2f}")
+                        print(f"    Diferença ações: {diferenca:.2f}, Ajuste saldo: R$ {ajuste:.2f}")
+                        print(f"    Contador de ajustes ANTES: {len(self.datas_ajuste)-1}")
+                        print(f"    Contador de ajustes DEPOIS: {len(self.datas_ajuste)}")
                 else:
                     # Mantém a quantidade de ações do último ajuste
                     qtd_acoes_nova = self.qtd_acoes[-1]

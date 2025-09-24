@@ -1,6 +1,6 @@
 import pandas as pd
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timedelta
 
 def conectar_banco():
     return sqlite3.connect('banco/mercado_opcoes.db')
@@ -28,11 +28,21 @@ def gravar_dados_acao():
     try:
         df = pd.read_excel('dados/dados_petrobras_3anos.xlsx')
         
-        # Preparar os dados para inserção
+        # Converter todas as datas para objetos datetime
+        df['Date'] = pd.to_datetime(df['Date'])
+        
+        # Encontrar a data de término (última data disponível)
+        data_termino = df['Date'].max().date()
+        data_inicio = df['Date'].min().date()
+        
+        print(f"Período de dados: {data_inicio} até {data_termino}")
+        print(f"Total de registros: {len(df)}")
+        
+        # Preparar os dados para inserção (TODOS os registros)
         dados_para_inserir = []
         for _, row in df.iterrows():
             # Converter a data para o formato correto
-            data = pd.to_datetime(row['Date']).strftime('%Y-%m-%d')
+            data = row['Date'].strftime('%Y-%m-%d')
             
             dados_para_inserir.append((
                 id_ativo,
