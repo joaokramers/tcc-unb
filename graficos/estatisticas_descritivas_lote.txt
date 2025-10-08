@@ -2,15 +2,21 @@ ESTATÍSTICAS DESCRITIVAS - DELTA HEDGE AJUSTE POR LOTE
 ============================================================
 
 ESTATÍSTICAS GERAIS:
-Total de observações: 416
-Saldo Final - Média: R$ 300.77
-Saldo Final - Mediana: R$ 384.92
-Saldo Final - Desvio Padrão: R$ 467.21
+Total de observações: 480
+Saldo Final - Média: R$ 322.21
+Saldo Final - Mediana: R$ 389.50
+Saldo Final - Desvio Padrão: R$ 451.32
 Saldo Final - Mínimo: R$ -1330.38
 Saldo Final - Máximo: R$ 1364.07
 
 POR CATEGORIA DE SIMULAÇÃO:
 ----------------------------------------
+
+ITM → ITM:
+  Observações: 96
+  Média: R$ 415.62
+  Mediana: R$ 410.66
+  Desvio Padrão: R$ 188.14
 
 ATM → ITM:
   Observações: 104
@@ -36,17 +42,17 @@ OTM → OTM:
   Mediana: R$ 228.07
   Desvio Padrão: R$ 323.63
 
-ITM → ITM:
-  Observações: 64
-  Média: R$ 430.01
-  Mediana: R$ 419.37
-  Desvio Padrão: R$ 222.37
-
 ITM → ATM:
-  Observações: 8
-  Média: R$ 889.56
-  Mediana: R$ 845.91
-  Desvio Padrão: R$ 232.62
+  Observações: 24
+  Média: R$ 401.28
+  Mediana: R$ 264.71
+  Desvio Padrão: R$ 388.21
+
+ITM → OTM:
+  Observações: 16
+  Média: R$ 915.52
+  Mediana: R$ 868.25
+  Desvio Padrão: R$ 99.72
 
 OTM → ITM:
   Observações: 8
@@ -65,53 +71,53 @@ POR LIMITE DE LOTE:
 ----------------------------------------
 
 Limite 50 ações:
-  Observações: 104
-  Média: R$ 257.65
-  Mediana: R$ 397.83
-  Desvio Padrão: R$ 436.83
+  Observações: 120
+  Média: R$ 280.31
+  Mediana: R$ 395.27
+  Desvio Padrão: R$ 422.73
 
 Limite 100 ações:
-  Observações: 104
-  Média: R$ 294.78
-  Mediana: R$ 384.92
-  Desvio Padrão: R$ 415.01
+  Observações: 120
+  Média: R$ 314.67
+  Mediana: R$ 391.82
+  Desvio Padrão: R$ 407.52
 
 Limite 200 ações:
-  Observações: 104
-  Média: R$ 278.91
+  Observações: 120
+  Média: R$ 302.51
   Mediana: R$ 328.48
-  Desvio Padrão: R$ 439.77
+  Desvio Padrão: R$ 421.84
 
 Limite 300 ações:
-  Observações: 104
-  Média: R$ 371.72
-  Mediana: R$ 466.78
-  Desvio Padrão: R$ 561.77
+  Observações: 120
+  Média: R$ 391.35
+  Mediana: R$ 446.27
+  Desvio Padrão: R$ 538.63
 
 
 POR PERÍODO DE VOLATILIDADE:
 ----------------------------------------
 
 30 pregões:
-  Observações: 104
-  Média: R$ 310.51
+  Observações: 120
+  Média: R$ 329.84
   Mediana: R$ 395.76
-  Desvio Padrão: R$ 456.20
+  Desvio Padrão: R$ 440.78
 
 60 pregões:
-  Observações: 104
-  Média: R$ 316.86
-  Mediana: R$ 410.03
-  Desvio Padrão: R$ 462.42
+  Observações: 120
+  Média: R$ 334.25
+  Mediana: R$ 405.49
+  Desvio Padrão: R$ 445.97
 
 120 pregões:
-  Observações: 104
-  Média: R$ 285.62
-  Mediana: R$ 347.59
-  Desvio Padrão: R$ 477.28
+  Observações: 120
+  Média: R$ 311.24
+  Mediana: R$ 354.06
+  Desvio Padrão: R$ 461.09
 
 252 pregões:
-  Observações: 104
-  Média: R$ 290.08
-  Mediana: R$ 378.57
-  Desvio Padrão: R$ 478.60
+  Observações: 120
+  Média: R$ 313.51
+  Mediana: R$ 383.66
+  Desvio Padrão: R$ 462.28

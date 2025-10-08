@@ -1,0 +1,72 @@
+ESTATÍSTICAS DESCRITIVAS - DISTÂNCIA STRIKE-PREÇO (ITM)
+======================================================================
+
+ESTATÍSTICAS GERAIS (TODAS AS ESTRATÉGIAS):
+--------------------------------------------------
+Total de observações ITM: 374
+Distância média: 5.43%
+Distância desvio padrão: 1.66%
+Distância mínima: 2.19%
+Distância máxima: 8.31%
+
+Saldo Final médio: R$ 464.16
+Saldo Final desvio padrão: R$ 309.73
+Saldo Final mínimo: R$ -822.15
+Saldo Final máximo: R$ 1234.83
+
+Correlação geral (Distância × Saldo): -0.1410
+
+ESTRATÉGIA: Delta
+------------------------------
+Observações: 102
+Distância média: 5.43%
+Saldo médio: R$ 506.02
+Correlação: -0.1864
+R²: 0.0348
+
+ESTRATÉGIA: Dia
+------------------------------
+Observações: 136
+Distância média: 5.43%
+Saldo médio: R$ 425.03
+Correlação: -0.0942
+R²: 0.0089
+
+ESTRATÉGIA: Lote
+------------------------------
+Observações: 136
+Distância média: 5.43%
+Saldo médio: R$ 471.90
+Correlação: -0.1699
+R²: 0.0289
+
+ANÁLISE POR FAIXAS DE DISTÂNCIA:
+----------------------------------------
+
+0-2.5%:
+  Observações: 22
+  Distância média: 2.19%
+  Saldo médio: R$ 889.02
+  Saldo desvio padrão: R$ 210.81
+  Coeficiente de variação: 0.2371
+
+2.5-5%:
+  Observações: 176
+  Distância média: 4.33%
+  Saldo médio: R$ 485.69
+  Saldo desvio padrão: R$ 362.16
+  Coeficiente de variação: 0.7457
+
+5-7.5%:
+  Observações: 132
+  Distância média: 6.46%
+  Saldo médio: R$ 293.63
+  Saldo desvio padrão: R$ 111.60
+  Coeficiente de variação: 0.3801
+
+7.5-10%:
+  Observações: 44
+  Distância média: 8.31%
+  Saldo médio: R$ 677.25
+  Saldo desvio padrão: R$ 93.65
+  Coeficiente de variação: 0.1383

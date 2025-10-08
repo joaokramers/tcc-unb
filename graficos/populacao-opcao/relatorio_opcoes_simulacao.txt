@@ -1,0 +1,251 @@
+RELATÓRIO SIMPLIFICADO DE OPÇÕES UTILIZADAS NAS SIMULAÇÕES
+======================================================================
+
+ESTATÍSTICAS GERAIS:
+------------------------------
+Total de simulações: 30
+Opções únicas: 30
+
+DETALHES DAS OPÇÕES:
+--------------------
+
+SIMULAÇÃO 1:
+  Opção: PETRE284
+  Strike: R$ 27.76
+  Data Vencimento: 2025-05-16
+  Data Início Simulação: 2025-04-15
+  Preço Opção: R$ 3.32
+  Preço Abertura PETR: R$ 29.39
+
+SIMULAÇÃO 13:
+  Opção: PETRE289
+  Strike: R$ 28.26
+  Data Vencimento: 2025-05-16
+  Data Início Simulação: 2025-04-15
+  Preço Opção: R$ 2.94
+  Preço Abertura PETR: R$ 29.39
+
+SIMULAÇÃO 25:
+  Opção: PETRE301
+  Strike: R$ 29.26
+  Data Vencimento: 2025-05-16
+  Data Início Simulação: 2025-04-15
+  Preço Opção: R$ 1.93
+  Preço Abertura PETR: R$ 29.39
+
+SIMULAÇÃO 37:
+  Opção: PETRE306
+  Strike: R$ 30.01
+  Data Vencimento: 2025-05-16
+  Data Início Simulação: 2025-04-15
+  Preço Opção: R$ 1.60
+  Preço Abertura PETR: R$ 29.39
+
+SIMULAÇÃO 49:
+  Opção: PETRE312
+  Strike: R$ 30.51
+  Data Vencimento: 2025-05-16
+  Data Início Simulação: 2025-04-15
+  Preço Opção: R$ 1.33
+  Preço Abertura PETR: R$ 29.39
+
+SIMULAÇÃO 61:
+  Opção: PETRE316
+  Strike: R$ 31.01
+  Data Vencimento: 2025-05-16
+  Data Início Simulação: 2025-04-15
+  Preço Opção: R$ 1.06
+  Preço Abertura PETR: R$ 29.39
+
+SIMULAÇÃO 73:
+  Opção: PETRE321
+  Strike: R$ 31.51
+  Data Vencimento: 2025-05-16
+  Data Início Simulação: 2025-04-15
+  Preço Opção: R$ 0.80
+  Preço Abertura PETR: R$ 29.39
+
+SIMULAÇÃO 85:
+  Opção: PETRF303
+  Strike: R$ 28.94
+  Data Vencimento: 2025-06-20
+  Data Início Simulação: 2025-05-19
+  Preço Opção: R$ 2.73
+  Preço Abertura PETR: R$ 30.22
+
+SIMULAÇÃO 97:
+  Opção: PETRF321
+  Strike: R$ 30.69
+  Data Vencimento: 2025-06-20
+  Data Início Simulação: 2025-05-19
+  Preço Opção: R$ 1.29
+  Preço Abertura PETR: R$ 30.22
+
+SIMULAÇÃO 109:
+  Opção: PETRF326
+  Strike: R$ 31.19
+  Data Vencimento: 2025-06-20
+  Data Início Simulação: 2025-05-19
+  Preço Opção: R$ 0.96
+  Preço Abertura PETR: R$ 30.22
+
+SIMULAÇÃO 121:
+  Opção: PETRF331
+  Strike: R$ 29.69
+  Data Vencimento: 2025-06-20
+  Data Início Simulação: 2025-05-19
+  Preço Opção: R$ 0.74
+  Preço Abertura PETR: R$ 30.22
+
+SIMULAÇÃO 133:
+  Opção: PETRF342
+  Strike: R$ 32.69
+  Data Vencimento: 2025-06-20
+  Data Início Simulação: 2025-05-19
+  Preço Opção: R$ 0.34
+  Preço Abertura PETR: R$ 30.22
+
+SIMULAÇÃO 145:
+  Opção: PETRF376
+  Strike: R$ 33.44
+  Data Vencimento: 2025-06-20
+  Data Início Simulação: 2025-05-19
+  Preço Opção: R$ 0.21
+  Preço Abertura PETR: R$ 30.22
+
+SIMULAÇÃO 157:
+  Opção: PETRG307
+  Strike: R$ 29.23
+  Data Vencimento: 2025-07-18
+  Data Início Simulação: 2025-06-17
+  Preço Opção: R$ 4.16
+  Preço Abertura PETR: R$ 31.66
+
+SIMULAÇÃO 169:
+  Opção: PETRG332
+  Strike: R$ 31.73
+  Data Vencimento: 2025-07-18
+  Data Início Simulação: 2025-06-17
+  Preço Opção: R$ 2.03
+  Preço Abertura PETR: R$ 31.66
+
+SIMULAÇÃO 181:
+  Opção: PETRG353
+  Strike: R$ 30.98
+  Data Vencimento: 2025-07-18
+  Data Início Simulação: 2025-06-17
+  Preço Opção: R$ 2.63
+  Preço Abertura PETR: R$ 31.66
+
+SIMULAÇÃO 193:
+  Opção: PETRG388
+  Strike: R$ 34.48
+  Data Vencimento: 2025-07-18
+  Data Início Simulação: 2025-06-17
+  Preço Opção: R$ 0.59
+  Preço Abertura PETR: R$ 31.66
+
+SIMULAÇÃO 205:
+  Opção: PETRG398
+  Strike: R$ 35.48
+  Data Vencimento: 2025-07-18
+  Data Início Simulação: 2025-06-17
+  Preço Opção: R$ 0.37
+  Preço Abertura PETR: R$ 31.66
+
+SIMULAÇÃO 217:
+  Opção: PETRH1
+  Strike: R$ 35.23
+  Data Vencimento: 2025-08-15
+  Data Início Simulação: 2025-07-15
+  Preço Opção: R$ 0.13
+  Preço Abertura PETR: R$ 31.52
+
+SIMULAÇÃO 229:
+  Opção: PETRH304
+  Strike: R$ 29.73
+  Data Vencimento: 2025-08-15
+  Data Início Simulação: 2025-07-15
+  Preço Opção: R$ 2.81
+  Preço Abertura PETR: R$ 31.52
+
+SIMULAÇÃO 241:
+  Opção: PETRH310
+  Strike: R$ 30.23
+  Data Vencimento: 2025-08-15
+  Data Início Simulação: 2025-07-15
+  Preço Opção: R$ 2.31
+  Preço Abertura PETR: R$ 31.52
+
+SIMULAÇÃO 253:
+  Opção: PETRH335
+  Strike: R$ 31.98
+  Data Vencimento: 2025-08-15
+  Data Início Simulação: 2025-07-15
+  Preço Opção: R$ 1.09
+  Preço Abertura PETR: R$ 31.52
+
+SIMULAÇÃO 265:
+  Opção: PETRH345
+  Strike: R$ 32.98
+  Data Vencimento: 2025-08-15
+  Data Início Simulação: 2025-07-15
+  Preço Opção: R$ 0.62
+  Preço Abertura PETR: R$ 31.52
+
+SIMULAÇÃO 277:
+  Opção: PETRH369
+  Strike: R$ 36.23
+  Data Vencimento: 2025-08-15
+  Data Início Simulação: 2025-07-15
+  Preço Opção: R$ 0.08
+  Preço Abertura PETR: R$ 31.52
+
+SIMULAÇÃO 289:
+  Opção: PETRI288
+  Strike: R$ 27.47
+  Data Vencimento: 2025-09-19
+  Data Início Simulação: 2025-08-19
+  Preço Opção: R$ 2.48
+  Preço Abertura PETR: R$ 29.53
+
+SIMULAÇÃO 301:
+  Opção: PETRI28
+  Strike: R$ 28.22
+  Data Vencimento: 2025-09-19
+  Data Início Simulação: 2025-08-19
+  Preço Opção: R$ 1.31
+  Preço Abertura PETR: R$ 29.53
+
+SIMULAÇÃO 313:
+  Opção: PETRI29
+  Strike: R$ 28.97
+  Data Vencimento: 2025-09-19
+  Data Início Simulação: 2025-08-19
+  Preço Opção: R$ 1.31
+  Preço Abertura PETR: R$ 29.53
+
+SIMULAÇÃO 325:
+  Opção: PETRI313
+  Strike: R$ 29.22
+  Data Vencimento: 2025-09-19
+  Data Início Simulação: 2025-08-19
+  Preço Opção: R$ 1.13
+  Preço Abertura PETR: R$ 29.53
+
+SIMULAÇÃO 337:
+  Opção: PETRI333
+  Strike: R$ 31.22
+  Data Vencimento: 2025-09-19
+  Data Início Simulação: 2025-08-19
+  Preço Opção: R$ 0.28
+  Preço Abertura PETR: R$ 29.53
+
+SIMULAÇÃO 349:
+  Opção: PETRI341
+  Strike: R$ 31.97
+  Data Vencimento: 2025-09-19
+  Data Início Simulação: 2025-08-19
+  Preço Opção: R$ 0.15
+  Preço Abertura PETR: R$ 29.53
+

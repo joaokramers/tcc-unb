@@ -1,0 +1,86 @@
+ANÁLISE ESTATÍSTICA AVANÇADA - DISTÂNCIA STRIKE-PREÇO (ITM)
+======================================================================
+
+1. REGRESSÃO LINEAR MÚLTIPLA
+----------------------------------------
+Modelo: SaldoFinal = α + β₁ · Prêmio + β₂ · Distância + ε
+
+Coeficientes:
+  α (intercepto): 584.87
+  β₁ (prêmio): 14.6240
+  β₂ (distância): -29.6492
+R²: 0.0208
+R² ajustado: 0.0155
+
+Interpretação:
+  - Aumento de R$ 1 no prêmio inicial resulta em 14.62 no saldo final
+  - Aumento de 1% na distância resulta em -29.65 no saldo final
+  - 2.1% da variância do saldo final é explicada pelo modelo
+
+2. CORRELAÇÕES PARCIAIS
+------------------------------
+Correlações simples:
+  Saldo × Prêmio: -0.0465
+  Saldo × Distância: -0.1410
+  Prêmio × Distância: 0.5132
+
+Correlações parciais:
+  Saldo × Prêmio (controlando Distância): 0.0305
+  Saldo × Distância (controlando Prêmio): -0.1367
+
+3. VERIFICAÇÃO DE NÃO-LINEARIDADES
+----------------------------------------
+Modelo com termos quadráticos:
+  SaldoFinal = α + β₁·Prêmio + β₂·Distância + β₃·Prêmio² + β₄·Distância² + β₅·Prêmio·Distância + ε
+
+Coeficientes do modelo polinomial:
+  α (intercepto): 4253.21
+  β₁ (prêmio): -284.4188
+  β₂ (distância): -1120.7860
+  β₃ (prêmio²): -257.5330
+  β₄ (distância²): 261.4371
+  β₅ (prêmio×distância): 34.1030
+R²: 0.4290
+
+Comparação dos modelos:
+  Modelo linear: R² = 0.0208
+  Modelo polinomial: R² = 0.4290
+  Melhoria: 0.4082 (1962.9%)
+
+  → Há evidência de não-linearidades significativas
+
+4. ANÁLISE POR ESTRATÉGIA
+------------------------------
+
+Estratégia: Delta
+--------------------
+  Coeficientes:
+    α: 588.76
+    β₁ (prêmio): 60.1736
+    β₂ (distância): -45.7348
+  R²: 0.0531
+  Correlações:
+    Saldo × Prêmio: 0.0204
+    Saldo × Distância: -0.1864
+
+Estratégia: Dia
+--------------------
+  Coeficientes:
+    α: 603.37
+    β₁ (prêmio): -47.0392
+    β₂ (distância): -9.0250
+  R²: 0.0163
+  Correlações:
+    Saldo × Prêmio: -0.1221
+    Saldo × Distância: -0.0942
+
+Estratégia: Lote
+--------------------
+  Coeficientes:
+    α: 563.44
+    β₁ (prêmio): 42.1250
+    β₂ (distância): -38.2092
+  R²: 0.0382
+  Correlações:
+    Saldo × Prêmio: -0.0044
+    Saldo × Distância: -0.1699
