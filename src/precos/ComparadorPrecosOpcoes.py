@@ -10,7 +10,11 @@ import pandas as pd
 from helper.TradeHelper import TradeHelper
 
 # Constante para o ID da simulação
-ID_SIMULACAO =5
+# Opções disponíveis:
+# 29 - PETRI28 (ITM, Delta 0.82)
+# 31 - PETRI313 (ATM, Delta 0.65)
+# 27 - PETRH369 (OTM, Delta 0.05)
+ID_SIMULACAO = 31  # PETRI313 (ATM - melhor aderência ao BS)
 
 class ComparadorPrecosOpcoes:
     def __init__(self, conn: sqlite3.Connection, id_simulacao: int, pregoes_volatilidade: int = 30,
@@ -120,6 +124,7 @@ class ComparadorPrecosOpcoes:
         self.precos_bs = []
         self.deltas = []
         self.diferenca_percentual = []
+        self.dias_ate_vencimento_lista = []
         
         for data_str, preco_ativo in self.precos_ativo:
             # Converte a data para datetime.date
@@ -177,6 +182,7 @@ class ComparadorPrecosOpcoes:
             self.precos_bs.append(preco_bs)
             self.deltas.append(delta)
             self.diferenca_percentual.append(diferenca_percentual)
+            self.dias_ate_vencimento_lista.append(dias_ate_vencimento)
     
     def listar_dados(self) -> pd.DataFrame:
         """
@@ -185,6 +191,7 @@ class ComparadorPrecosOpcoes:
         Returns:
             pd.DataFrame: DataFrame com as colunas:
                 - Data
+                - Dias até Vencimento
                 - Preço Ação
                 - Preço Mercado
                 - Preço BS
@@ -194,6 +201,7 @@ class ComparadorPrecosOpcoes:
         # Cria um DataFrame com os dados
         df = pd.DataFrame({
             'Data': self.datas,
+            'Dias até Venc.': self.dias_ate_vencimento_lista,
             'Preço Ação': [row[1] for row in self.precos_ativo],
             'Preço Mercado': self.precos_mercado,
             'Preço BS': self.precos_bs,
@@ -236,32 +244,46 @@ class ComparadorPrecosOpcoes:
             self.data_inicio.strftime("%Y-%m-%d")
         )
         
+        # Imprime os dados da simulação
+        print("\n" + "=" * 80)
+        print("COMPARAÇÃO DE PREÇOS - BLACK-SCHOLES vs MERCADO")
+        print("=" * 80)
+        print(f"\nSimulação ID: {self.id_simulacao}")
+        print(f"Período da Simulação: {self.data_inicio} até {self.data_termino}")
+        print(f"Ativo: {self.ticker_ativo}")
+        
         # Imprime os dados da opção
         print("\nDados da Opção:")
-        print("==================================================")
+        print("-" * 80)
+        print(f"ID da Opção: {self.id_opcao}")
         print(f"Ticker: {ticker}")
         print(f"Strike: R$ {strike:.2f}")
         print(f"Vencimento: {vencimento}")
         print(f"Pregões de Volatilidade: {self.pregoes_volatilidade}")
-        print(f"Volatilidade: {sigma*100:.1f}%")
+        print(f"Volatilidade Inicial: {sigma*100:.1f}%")
         print(f"Taxa de Juros: {self.taxa_juros*100:.1f}%")
-        print("==================================================\n")
+        print("-" * 80)
         
         # Imprime os dados da comparação
-        print("Comparação de Preços:")
-        print("================================================================================")
+        print("\nComparação de Preços:")
+        print("=" * 80)
         
         df = self.listar_dados()
         print(df.to_string(index=False))
-        print("================================================================================")
+        print("=" * 80)
         
-        print(f"\nTotal de dias: {len(df)}")
-        print(f"Diferença Média: {df['Diferença %'].str.rstrip('%').astype(float).mean():.2f}%")
+        print(f"\nEstatísticas:")
+        print(f"  Total de dias analisados: {len(df)}")
+        print(f"  Diferença Média (Mercado vs BS): {df['Diferença %'].str.rstrip('%').astype(float).mean():.2f}%")
+        print("=" * 80)
 
 if __name__ == "__main__":
     # Conecta ao banco de dados
     caminho_banco = 'banco/mercado_opcoes.db'
     conn = sqlite3.connect(caminho_banco)
+    
+    # Lista de pregões de volatilidade a serem testados
+    pregoes_volatilidade_lista = [30, 60, 120, 252]
     
     try:
         # Busca os dados da simulação
@@ -279,22 +301,32 @@ if __name__ == "__main__":
         data_inicio = datetime.strptime(simulacao[1], "%Y-%m-%d").date()
         data_termino = datetime.strptime(simulacao[2], "%Y-%m-%d").date()
         
-        print(f"\nTestando ComparadorPrecosOpcoes com simulação ID {ID_SIMULACAO}")
+        print(f"\n{'='*80}")
+        print(f"COMPARAÇÃO DE PREÇOS - SIMULAÇÃO ID {ID_SIMULACAO}")
         print(f"Período: {data_inicio} até {data_termino}")
+        print(f"{'='*80}\n")
         
-        # Cria e processa a comparação
-        comparador = ComparadorPrecosOpcoes(
-            conn=conn,
-            id_simulacao=ID_SIMULACAO,
-            pregoes_volatilidade=30,  # x pregões para cálculo da volatilidade
-            taxa_juros=0.15          # 15% ao ano
-        )
-        
-        # Processa os dados
-        comparador.processar()
-        
-        # Imprime os resultados
-        comparador.imprimir_dados()
+        # Itera sobre cada valor de pregões de volatilidade
+        for pregoes in pregoes_volatilidade_lista:
+            print(f"\n{'#'*80}")
+            print(f"# ANÁLISE COM {pregoes} PREGÕES DE VOLATILIDADE")
+            print(f"{'#'*80}")
+            
+            # Cria e processa a comparação
+            comparador = ComparadorPrecosOpcoes(
+                conn=conn,
+                id_simulacao=ID_SIMULACAO,
+                pregoes_volatilidade=pregoes,
+                taxa_juros=0.15  # 15% ao ano
+            )
+            
+            # Processa os dados
+            comparador.processar()
+            
+            # Imprime os resultados
+            comparador.imprimir_dados()
+            
+            print(f"\n{'#'*80}\n")
         
     except Exception as e:
         print(f"\nErro durante a execução: {str(e)}")
